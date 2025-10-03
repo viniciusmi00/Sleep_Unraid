@@ -1,0 +1,58 @@
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE PLUGIN [
+<!ENTITY name "Sleep Unraid">
+<!ENTITY author "Vinícius P. Miranda">
+<!ENTITY version "1.0">
+<!ENTITY plugdir "/usr/local/emhttp/plugins/&name;">
+<!ENTITY confdir "/boot/config/plugins/&name;">
+<!ENTITY conffile "&confdir;/&name;.cfg">
+]>
+<PLUGIN name="&name;" author="&author;" version="&version;" icon="plugin_icon.png" min="6.12.0" support="URL do Tópico no Fórum Aqui">
+
+<DESCRIPTION>
+O Sleep Unraid é um plugin de gerenciamento de energia que coloca seu servidor Unraid para dormir durante períodos de inatividade, com base em um conjunto de regras altamente personalizáveis. Monitore a atividade de discos, rede e usuários para economizar energia de forma segura e eficiente.
+</DESCRIPTION>
+
+<FILE Name="&plugdir;/" Mode="0770">
+  <INLINE Code="mkdir -p &plugdir;/scripts"/>
+  <INLINE Code="mkdir -p &plugdir;/images"/>
+</FILE>
+<FILE Name="&confdir;/" Mode="0770"/>
+
+<FILE Name="&plugdir;/SleepUnraid.php" Mode="0644" Source="source/usr/local/emhttp/plugins/SleepUnraid/SleepUnraid.php"/>
+<FILE Name="&plugdir;/SleepUnraid_header.php" Mode="0644" Source="source/usr/local/emhttp/plugins/SleepUnraid/SleepUnraid_header.php"/>
+<FILE Name="&plugdir;/plugin_icon.png" Mode="0644" Source="source/usr/local/emhttp/plugins/SleepUnraid/plugin_icon.png"/>
+<FILE Name="&plugdir;/images/moon-dark.svg" Mode="0644" Source="source/usr/local/emhttp/plugins/SleepUnraid/images/moon-dark.svg"/>
+<FILE Name="&plugdir;/images/moon-light.svg" Mode="0644" Source="source/usr/local/emhttp/plugins/SleepUnraid/images/moon-light.svg"/>
+
+<FILE Name="&plugdir;/scripts/sleep_unraid_monitor.sh" Mode="0755" Source="source/usr/local/emhttp/plugins/SleepUnraid/scripts/sleep_unraid_monitor.sh"/>
+<FILE Name="&plugdir;/scripts/sleep_unraid_sleep.sh" Mode="0755" Source="source/usr/local/emhttp/plugins/SleepUnraid/scripts/sleep_unraid_sleep.sh"/>
+<FILE Name="&plugdir;/scripts/sleep_unraid_wake.sh" Mode="0755" Source="source/usr/local/emhttp/plugins/SleepUnraid/scripts/sleep_unraid_wake.sh"/>
+<FILE Name="&plugdir;/scripts/manual_sleep.php" Mode="0755" Source="source/usr/local/emhttp/plugins/SleepUnraid/scripts/manual_sleep.php"/>
+<FILE Name="&plugdir;/scripts/get_system_info.php" Mode="0755" Source="source/usr/local/emhttp/plugins/SleepUnraid/scripts/get_system_info.php"/>
+
+<FILE Name="/etc/rc.d/rc.SleepUnraid" Mode="0755" Source="source/etc/rc.d/rc.SleepUnraid"/>
+
+<EVENT NAME="page_head" FILE="&plugdir;/SleepUnraid_header.php"/>
+
+<EXEC>
+  touch &conffile;
+
+  chmod +x &plugdir;/scripts/*.sh
+  chmod +x &plugdir;/scripts/*.php
+  chmod +x /etc/rc.d/rc.SleepUnraid
+
+  /etc/rc.d/rc.SleepUnraid start
+</EXEC>
+
+<FILE Action="remove">
+  <EXEC>
+    /etc/rc.d/rc.SleepUnraid stop
+  </EXEC>
+  
+  <FILE Name="&plugdir;"/>
+  <FILE Name="&confdir;"/>
+  <FILE Name="/etc/rc.d/rc.SleepUnraid"/>
+</FILE>
+
+</PLUGIN>
